@@ -2,11 +2,6 @@ import Dispatch
 import Foundation
 
 
-enum TimerError: Error {
-    case timerRunningError(String)
-}
-
-
 public class Timer {
     private var start: DispatchTime
     private var end = DispatchTime(uptimeNanoseconds: 0)
@@ -20,15 +15,14 @@ public class Timer {
     }
 
     public func getTime() -> UInt64 {
-//TODO
-//        guard end.uptimeNanoseconds > 0 else {
-//            throw TimerError.timerRunningError("Timer.stop() must be called first")
-//        }
+        if end.uptimeNanoseconds == 0 {
+            print("Warning Timer.stop() never called")
+	}
         return end.uptimeNanoseconds - start.uptimeNanoseconds
     }
 
     public func getTimeAsString() -> String {
-        return getTimeString (Double(end.uptimeNanoseconds - start.uptimeNanoseconds) )
+        return getTimeString (Double(getTime()) )
     }
 }
 
@@ -63,10 +57,11 @@ public func timeMagic(_ function: () -> ()) {
 public func timeitMagic(_ n_times: Int = 10, _ function: () -> ()) {
     assert(n_times > 0)
     let nsArray: [Double] = (0..<n_times+1).map({_ in getExecutionTime(function)})
+    let mean = (nsArray.reduce(0, +)) / Double(n_times)
+    let variance = nsArray.map({pow(($0 - mean), 2)}).reduce(0, +) / Double(n_times)
+
     print("Max: \(getTimeString(nsArray.max()!))")
     print("Min: \(getTimeString(nsArray.min()!))")
-    let mean = (nsArray.reduce(0, +)) / Double(n_times)
     print("Mean: \(getTimeString(mean))")
-    let variance = nsArray.map({pow(($0 - mean), 2)}).reduce(0, +) / Double(n_times)
     print("Std Dev: \( getTimeString(sqrt(variance)))")
 }
