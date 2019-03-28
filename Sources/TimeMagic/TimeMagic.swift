@@ -56,7 +56,7 @@ public func timeMagic(_ function: () -> ()) {
 
 public func timeitMagic(_ n_times: Int = 10, _ function: () -> ()) {
     assert(n_times > 0)
-    let nsArray: [Double] = (0..<n_times+1).map({_ in getExecutionTime(function)})
+    let nsArray: [Double] = (0..<n_times).map({_ in getExecutionTime(function)})
     let mean = (nsArray.reduce(0, +)) / Double(n_times)
     let variance = nsArray.map({pow(($0 - mean), 2)}).reduce(0, +) / Double(n_times)
 
